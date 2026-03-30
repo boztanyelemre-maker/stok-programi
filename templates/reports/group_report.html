@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Stok Grup Raporu{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-pie-chart me-2"></i>Stok Grup Raporu</h4>
+</div>
+<div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Ana Grup</label>
+            <select name="category" class="form-select">
+                <option value="">Lutfen Seciniz</option>
+                {% for c in categories %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Baslangic</label>
+            <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Bitis</label>
+            <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary"><i class="bi bi-search"></i> Listele</button>
+        </div>
+    </form>
+</div>
+{% if data %}
+<div class="table-container">
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Barkod</th><th>Urun Adi</th><th>Toplam Giris</th><th>Toplam Cikis</th></tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+            <tr>
+                <td><code>{{ item.product__barcode }}</code></td>
+                <td>{{ item.product__name }}</td>
+                <td class="text-success">{{ item.total_in|default:"0" }}</td>
+                <td class="text-danger">{{ item.total_out|default:"0" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

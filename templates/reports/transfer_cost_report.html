@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Transfer Maliyet Raporu{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-cash-stack me-2"></i>Stok Transfer Maliyet Raporu</h4>
+</div>
+<div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Baslangic</label>
+            <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Bitis</label>
+            <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary"><i class="bi bi-search"></i> Listele</button>
+        </div>
+    </form>
+</div>
+<div class="table-container">
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Barkod</th><th>Ad</th><th>Kaynak</th><th>Hedef</th><th>Transfer Miktari</th><th>Alis Maliyeti</th><th>Tarih</th></tr>
+        </thead>
+        <tbody>
+            {% for item in cost_data %}
+            <tr>
+                <td><code>{{ item.barcode }}</code></td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.project }}</td>
+                <td>{{ item.target }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.cost }}</td>
+                <td>{{ item.date|date:"d/m/Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center text-danger">Veri Yok.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

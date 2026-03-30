@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Siparis Detay - {{ order.order_no }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-cart me-2"></i>SIP-{{ order.order_no }}</h4>
+    <span class="badge status-{{ order.status }} fs-6">{{ order.get_status_display }}</span>
+</div>
+<div class="form-container mb-4">
+    <div class="row">
+        <div class="col-md-3"><strong>Siparis No:</strong> SIP-{{ order.order_no }}</div>
+        <div class="col-md-3"><strong>Tarih:</strong> {{ order.date|date:"d/m/Y" }}</div>
+        <div class="col-md-3"><strong>Proje:</strong> {{ order.project.name }}</div>
+        <div class="col-md-3"><strong>Tur:</strong> {{ order.get_order_type_display }}</div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-3"><strong>Talep Eden:</strong> {{ order.requested_by.get_full_name|default:"-" }}</div>
+        <div class="col-md-3"><strong>Onaylayan:</strong> {{ order.approved_by.get_full_name|default:"-" }}</div>
+        <div class="col-md-3"><strong>Teslim Tarihi:</strong> {{ order.delivery_date|date:"d/m/Y"|default:"-" }}</div>
+        <div class="col-md-3"><strong>Not:</strong> {{ order.notes|default:"-" }}</div>
+    </div>
+</div>
+
+{% if order.status == 'approved' or order.status == 'preparing' %}
+<div class="form-container mb-4">
+    <h6 class="fw-bold">Teslim Bilgileri Gir</h6>
+    <form method="post" action="{% url 'order_deliver' order.pk %}">
+        {% csrf_token %}
+        <table class="table">
+            <thead><tr><th>Urun</th><th>Siparis</th><th>Teslim Edilen</th><th>Yeni Teslim</th></tr></thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.delivered_quantity }}</td>
+                    <td><input type="number" name="delivered_{{ item.id }}" class="form-control form-control-sm" value="{{ item.delivered_quantity }}" step="0.01" style="width:120px;"></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-success btn-sm">Teslim Kaydet</button>
+    </form>
+</div>
+{% endif %}
+
+<div class="table-container">
+    <table class="table">
+        <thead><tr><th>#</th><th>Barkod</th><th>Urun</th><th>Siparis Miktari</th><th>Teslim Edilen</th><th>Kalan</th><th>Birim Fiyat</th><th>Toplam</th></tr></thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><code>{{ item.product.barcode }}</code></td>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.delivered_quantity }}</td>
+                <td class="{% if item.remaining > 0 %}text-warning{% endif %}">{{ item.remaining }}</td>
+                <td>{{ item.unit_price }}</td>
+                <td>{{ item.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="fw-bold"><td colspan="7" class="text-end">TOPLAM:</td><td>{{ order.total_amount }}</td></tr>
+        </tfoot>
+    </table>
+</div>
+<div class="mt-3">
+    <a href="{% url 'order_list' %}" class="btn btn-secondary"><i class="bi bi-arrow-left me-1"></i>Geri</a>
+</div>
+{% endblock %}

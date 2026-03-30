@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Siparis Teslim Raporu{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-truck me-2"></i>Siparis Teslim Raporu</h4>
+</div>
+<div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Baslangic</label>
+            <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Bitis</label>
+            <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary"><i class="bi bi-search"></i> Listele</button>
+        </div>
+    </form>
+</div>
+<div class="table-container">
+    <table class="table table-striped">
+        <thead><tr><th>Siparis No</th><th>Proje</th><th>Teslim Tarihi</th><th>Durum</th><th>Islem</th></tr></thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td><a href="{% url 'order_detail' o.pk %}">SIP-{{ o.order_no }}</a></td>
+                <td>{{ o.project.name }}</td>
+                <td>{{ o.delivery_date|date:"d/m/Y"|default:"-" }}</td>
+                <td><span class="badge status-{{ o.status }}">{{ o.get_status_display }}</span></td>
+                <td><a href="{% url 'order_detail' o.pk %}" class="btn btn-info action-btn"><i class="bi bi-eye"></i></a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-danger">Veri Yok.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

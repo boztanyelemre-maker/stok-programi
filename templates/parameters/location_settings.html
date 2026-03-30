@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Lokasyon Ayarlari{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-building me-2"></i>Depo / Bina / Kat / Oda Ayarlari</h4>
+</div>
+<div class="row g-3">
+    <!-- Depo/Bina -->
+    <div class="col-md-4">
+        <div class="form-container">
+            <h6 class="fw-bold mb-3">Depo / Bina Ekle</h6>
+            <form method="post" action="{% url 'warehouse_create' %}">
+                {% csrf_token %}
+                <div class="mb-2">{{ wh_form.project }}</div>
+                <div class="mb-2">{{ wh_form.name }}</div>
+                <button class="btn btn-primary btn-sm w-100"><i class="bi bi-plus-lg me-1"></i>Ekle</button>
+            </form>
+            <hr>
+            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <table class="table table-sm">
+                    <thead><tr><th>Proje</th><th>Depo/Bina</th><th></th></tr></thead>
+                    <tbody>
+                        {% for wh in warehouses %}
+                        <tr>
+                            <td class="small">{{ wh.project.name|truncatewords:3 }}</td>
+                            <td>{{ wh.name }}</td>
+                            <td>
+                                <form method="post" action="{% url 'warehouse_delete' wh.pk %}" class="d-inline delete-confirm">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger action-btn"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-muted small">Kayit yok</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Lokasyon/Kat -->
+    <div class="col-md-4">
+        <div class="form-container">
+            <h6 class="fw-bold mb-3">Lokasyon (Kat) Ekle</h6>
+            <form method="post" action="{% url 'location_create' %}">
+                {% csrf_token %}
+                <div class="mb-2">{{ loc_form.warehouse }}</div>
+                <div class="mb-2">{{ loc_form.name }}</div>
+                <button class="btn btn-primary btn-sm w-100"><i class="bi bi-plus-lg me-1"></i>Ekle</button>
+            </form>
+            <hr>
+            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <table class="table table-sm">
+                    <thead><tr><th>Depo</th><th>Lokasyon</th><th></th></tr></thead>
+                    <tbody>
+                        {% for loc in locations %}
+                        <tr>
+                            <td class="small">{{ loc.warehouse.name }}</td>
+                            <td>{{ loc.name }}</td>
+                            <td>
+                                <form method="post" action="{% url 'location_delete' loc.pk %}" class="d-inline delete-confirm">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger action-btn"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-muted small">Kayit yok</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Oda/Alan -->
+    <div class="col-md-4">
+        <div class="form-container">
+            <h6 class="fw-bold mb-3">Oda / Alan Ekle</h6>
+            <form method="post" action="{% url 'room_create' %}">
+                {% csrf_token %}
+                <div class="mb-2">{{ room_form.location }}</div>
+                <div class="mb-2">{{ room_form.name }}</div>
+                <button class="btn btn-primary btn-sm w-100"><i class="bi bi-plus-lg me-1"></i>Ekle</button>
+            </form>
+            <hr>
+            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <table class="table table-sm">
+                    <thead><tr><th>Lokasyon</th><th>Oda</th><th></th></tr></thead>
+                    <tbody>
+                        {% for r in rooms %}
+                        <tr>
+                            <td class="small">{{ r.location.name }}</td>
+                            <td>{{ r.name }}</td>
+                            <td>
+                                <form method="post" action="{% url 'room_delete' r.pk %}" class="d-inline delete-confirm">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger action-btn"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-muted small">Kayit yok</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Transfer Raporu{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-arrow-left-right me-2"></i>Transfer Raporu</h4>
+</div>
+<div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <select name="project" class="form-select">
+                <option value="">Tum Projeler</option>
+                {% for p in projects %}
+                <option value="{{ p.id }}">{{ p.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+        </div>
+        <div class="col-md-2">
+            <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary"><i class="bi bi-search"></i> Listele</button>
+        </div>
+    </form>
+</div>
+<div class="table-container">
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Fis No</th><th>Tarih</th><th>Kaynak Proje</th><th>Hedef Proje</th><th>Urunler</th><th>Toplam Miktar</th><th>Olusturan</th></tr>
+        </thead>
+        <tbody>
+            {% for t in transfers %}
+            <tr>
+                <td><a href="{% url 'stock_slip_detail' t.pk %}">{{ t.slip_no }}</a></td>
+                <td>{{ t.date|date:"d/m/Y" }}</td>
+                <td>{{ t.project.name }}</td>
+                <td>{{ t.target_project.name|default:"-" }}</td>
+                <td>
+                    {% for item in t.items.all %}
+                    {{ item.product.name }} ({{ item.quantity }}){% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ t.total_quantity }}</td>
+                <td>{{ t.created_by.get_full_name|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center text-danger">Veri Yok.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if transfers.has_other_pages %}
+<nav class="mt-3">
+    <ul class="pagination justify-content-center">
+        {% if transfers.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ transfers.previous_page_number }}">Onceki</a></li>{% endif %}
+        {% for num in transfers.paginator.page_range %}
+        <li class="page-item {% if transfers.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endfor %}
+        {% if transfers.has_next %}<li class="page-item"><a class="page-link" href="?page={{ transfers.next_page_number }}">Sonraki</a></li>{% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

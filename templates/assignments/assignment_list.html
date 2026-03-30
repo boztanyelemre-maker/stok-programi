@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Zimmet Listesi{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-person-badge-fill me-2"></i>Zimmet Listesi</h4>
+    <a href="{% url 'assignment_create' %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>Yeni Zimmet
+    </a>
+</div>
+<div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Ad, TC Kimlik, malzeme ara...">
+        </div>
+        <div class="col-md-2">
+            <select name="status" class="form-select">
+                <option value="">Tum Durumlar</option>
+                <option value="active">Aktif</option>
+                <option value="returned">Iade Edildi</option>
+                <option value="lost">Kayip</option>
+                <option value="damaged">Hasarli</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+</div>
+<div class="table-container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Ad Soyad</th><th>TC Kimlik</th><th>Unvan</th><th>Proje</th>
+                <th>Malzeme/Demirbas</th><th>Miktar</th><th>Tarih</th><th>Durum</th><th>Islem</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in assignments %}
+            <tr>
+                <td>{{ a.assigned_to_name }}</td>
+                <td>{{ a.tc_kimlik|default:"-" }}</td>
+                <td>{{ a.title|default:"-" }}</td>
+                <td>{{ a.project.name }}</td>
+                <td>
+                    {% if a.product %}{{ a.product.name }}
+                    {% elif a.asset %}{{ a.asset.name }}
+                    {% else %}-{% endif %}
+                </td>
+                <td>{{ a.quantity }}</td>
+                <td>{{ a.assignment_date|date:"d/m/Y" }}</td>
+                <td><span class="badge status-{{ a.status }}">{{ a.get_status_display }}</span></td>
+                <td>
+                    <a href="{% url 'assignment_edit' a.pk %}" class="btn btn-primary action-btn">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    {% if a.status == 'active' %}
+                    <form method="post" action="{% url 'assignment_return' a.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button class="btn btn-warning action-btn" title="Iade"><i class="bi bi-arrow-return-left"></i></button>
+                    </form>
+                    {% endif %}
+                    <form method="post" action="{% url 'assignment_delete' a.pk %}" class="d-inline delete-confirm">
+                        {% csrf_token %}
+                        <button class="btn btn-danger action-btn"><i class="bi bi-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9" class="text-center text-danger">Veri Yok.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if assignments.has_other_pages %}
+<nav class="mt-3">
+    <ul class="pagination justify-content-center">
+        {% if assignments.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ assignments.previous_page_number }}">Onceki</a></li>{% endif %}
+        {% for num in assignments.paginator.page_range %}
+        <li class="page-item {% if assignments.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endfor %}
+        {% if assignments.has_next %}<li class="page-item"><a class="page-link" href="?page={{ assignments.next_page_number }}">Sonraki</a></li>{% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

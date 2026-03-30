@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Sayim Listesi{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-list-ol me-2"></i>Sayim Listesi</h4>
+    <a href="{% url 'stock_count_form' %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>Yeni Sayim
+    </a>
+</div>
+<div class="table-container">
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Fis No</th><th>Proje</th><th>Depo</th><th>Sayim Tarihi</th><th>Durum</th></tr>
+        </thead>
+        <tbody>
+            {% for c in counts %}
+            <tr>
+                <td>{{ c.slip.slip_no }}</td>
+                <td>{{ c.project.name }}</td>
+                <td>{{ c.warehouse|default:"-" }}</td>
+                <td>{{ c.count_date|date:"d/m/Y" }}</td>
+                <td><span class="badge status-{{ c.status }}">{{ c.get_status_display }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-danger">Veri Yok.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Fis Listesi{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-clipboard-data me-2"></i>Fis Listesi</h4>
+</div>
+<div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Fis no ara...">
+        </div>
+        <div class="col-md-2">
+            <select name="type" class="form-select">
+                <option value="">Tum Turler</option>
+                <option value="entry" {% if slip_type == 'entry' %}selected{% endif %}>Giris</option>
+                <option value="exit" {% if slip_type == 'exit' %}selected{% endif %}>Cikis</option>
+                <option value="transfer" {% if slip_type == 'transfer' %}selected{% endif %}>Transfer</option>
+                <option value="delivery" {% if slip_type == 'delivery' %}selected{% endif %}>Teslim</option>
+                <option value="count" {% if slip_type == 'count' %}selected{% endif %}>Sayim</option>
+            </select>
+        </div>
+        <div class="col-md-2">{{ filter_form.project }}</div>
+        <div class="col-md-2">{{ filter_form.start_date }}</div>
+        <div class="col-auto">
+            <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+</div>
+<div class="table-container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fis No</th><th>Tur</th><th>Tarih</th><th>Saat</th>
+                <th>Proje</th><th>Durum</th><th>Toplam Miktar</th><th>Olusturan</th><th>Islem</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for slip in slips %}
+            <tr>
+                <td><a href="{% url 'stock_slip_detail' slip.pk %}">{{ slip.slip_no }}</a></td>
+                <td>{{ slip.get_slip_type_display }}</td>
+                <td>{{ slip.date|date:"d/m/Y" }}</td>
+                <td>{{ slip.time|time:"H:i" }}</td>
+                <td>{{ slip.project.name }}</td>
+                <td><span class="badge status-{{ slip.status }}">{{ slip.get_status_display }}</span></td>
+                <td>{{ slip.total_quantity }}</td>
+                <td>{{ slip.created_by.get_full_name|default:"-" }}</td>
+                <td>
+                    <a href="{% url 'stock_slip_detail' slip.pk %}" class="btn btn-info action-btn">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9" class="text-center text-danger">Veri Yok.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if slips.has_other_pages %}
+<nav class="mt-3">
+    <ul class="pagination justify-content-center">
+        {% if slips.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ slips.previous_page_number }}">Onceki</a></li>{% endif %}
+        {% for num in slips.paginator.page_range %}
+        <li class="page-item {% if slips.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endfor %}
+        {% if slips.has_next %}<li class="page-item"><a class="page-link" href="?page={{ slips.next_page_number }}">Sonraki</a></li>{% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

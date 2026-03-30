@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-pc-display me-2"></i>{{ title }}</h4>
+</div>
+<div class="form-container">
+    <form method="post">
+        {% csrf_token %}
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab1">Demirbas Bilgileri</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab2">Kullanim Alani</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab3">Garanti & Bakim</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="tab1">
+                <div class="row">
+                    {% for field in form %}
+                    {% if field.name in 'barcode,code,name,serial_no,brand,model,main_category,sub_category,unit,quantity' %}
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<div class="text-danger small">{{ field.errors.0 }}</div>{% endif %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="tab2">
+                <div class="row">
+                    {% for field in form %}
+                    {% if field.name in 'project,warehouse,location,status,notes' %}
+                    <div class="col-md-{% if field.name == 'notes' %}12{% else %}4{% endif %} mb-3">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="tab3">
+                <div class="row">
+                    {% for field in form %}
+                    {% if field.name in 'warranty_start,warranty_years,maintenance_period_months' %}
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="text-end">
+            <a href="{% url 'asset_list' %}" class="btn btn-danger me-2">Temizle</a>
+            <button type="submit" class="btn btn-success">Kaydet</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

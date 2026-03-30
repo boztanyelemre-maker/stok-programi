@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load core_tags %}
+{% block title %}Ana Sayfa - Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-speedometer2 me-2"></i>Dashboard</h4>
+    <span class="text-light small">{{ request.user.get_full_name }}</span>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #1a73e8, #4fc3f7);">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_products }}</div>
+                    <div class="stat-label">Toplam Urun</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #dc3545, #ff6b6b);">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <div class="stat-value text-danger">{{ critical_count }}</div>
+                    <div class="stat-label">Kritik Stok</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #ffc107, #ffdb58);">
+                    <i class="bi bi-cart"></i>
+                </div>
+                <div>
+                    <div class="stat-value text-warning">{{ pending_orders }}</div>
+                    <div class="stat-label">Bekleyen Siparis</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #28a745, #51cf66);">
+                    <i class="bi bi-folder"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_projects }}</div>
+                    <div class="stat-label">Aktif Proje</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 2 -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #6f42c1, #a855f7);">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ active_assignments }}</div>
+                    <div class="stat-label">Aktif Zimmet</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #17a2b8, #38bdf8);">
+                    <i class="bi bi-pc-display"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_assets }}</div>
+                    <div class="stat-label">Demirbas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #28a745, #51cf66);">
+                    <i class="bi bi-arrow-down-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-value text-success">{{ total_in }}</div>
+                    <div class="stat-label">30 Gun Giris</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #e83e8c, #f472b6);">
+                    <i class="bi bi-arrow-up-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-value text-danger">{{ total_out }}</div>
+                    <div class="stat-label">30 Gun Cikis</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alerts Row -->
+{% if maintenance_needed > 0 or warranty_expiring > 0 %}
+<div class="row g-3 mb-4">
+    {% if maintenance_needed > 0 %}
+    <div class="col-md-6">
+        <div class="alert alert-warning mb-0">
+            <i class="bi bi-wrench me-2"></i>
+            <strong>{{ maintenance_needed }}</strong> demirbas bakim gerektiriyor.
+            <a href="{% url 'asset_list' %}?status=active" class="alert-link ms-2">Goruntule</a>
+        </div>
+    </div>
+    {% endif %}
+    {% if warranty_expiring > 0 %}
+    <div class="col-md-6">
+        <div class="alert alert-info mb-0">
+            <i class="bi bi-shield-exclamation me-2"></i>
+            <strong>{{ warranty_expiring }}</strong> demirbasin garantisi 30 gun icinde bitiyor.
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="row g-3">
+    <!-- Chart -->
+    <div class="col-md-7">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-bar-chart me-2"></i>Son 7 Gun - Giris/Cikis</h6>
+                <canvas id="movementChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Movements -->
+    <div class="col-md-5">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-clock-history me-2"></i>Son Hareketler</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead><tr><th>Urun</th><th>Tur</th><th>Miktar</th></tr></thead>
+                        <tbody>
+                            {% for m in recent_movements %}
+                            <tr>
+                                <td class="text-truncate" style="max-width:150px;">{{ m.product.name }}</td>
+                                <td>
+                                    {% if m.movement_type == 'in' %}<span class="badge bg-success">Giris</span>
+                                    {% elif m.movement_type == 'out' %}<span class="badge bg-danger">Cikis</span>
+                                    {% else %}<span class="badge bg-info">Transfer</span>{% endif %}
+                                </td>
+                                <td>{{ m.quantity }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-muted text-center">Henuz hareket yok</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Orders -->
+<div class="row g-3 mt-1">
+    <div class="col-12">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-cart me-2"></i>Son Siparisler</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead><tr><th>Siparis No</th><th>Proje</th><th>Durum</th><th>Tarih</th><th>Talep Eden</th></tr></thead>
+                        <tbody>
+                            {% for o in recent_orders %}
+                            <tr>
+                                <td><a href="{% url 'order_detail' o.pk %}">SIP-{{ o.order_no }}</a></td>
+                                <td>{{ o.project.name }}</td>
+                                <td><span class="badge status-{{ o.status }}">{{ o.get_status_display }}</span></td>
+                                <td>{{ o.date }}</td>
+                                <td>{{ o.requested_by.get_full_name|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-muted text-center">Henuz siparis yok</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+var dailyData = {{ daily_data|safe }};
+var ctx = document.getElementById('movementChart');
+if (ctx) {
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dailyData.map(function(d) { return d.date; }),
+            datasets: [
+                {
+                    label: 'Giris',
+                    data: dailyData.map(function(d) { return d.in; }),
+                    backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                    borderRadius: 4,
+                },
+                {
+                    label: 'Cikis',
+                    data: dailyData.map(function(d) { return d.out; }),
+                    backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                    borderRadius: 4,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } },
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+}
+</script>
+{% endblock %}

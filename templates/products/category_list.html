@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Kategoriler{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-tags me-2"></i>Kategori Yonetimi</h4>
+</div>
+<div class="row g-4">
+    <!-- Ana Kategoriler -->
+    <div class="col-md-6">
+        <div class="form-container mb-3">
+            <h6 class="fw-bold">Yeni Ana Kategori</h6>
+            <form method="post" action="{% url 'main_category_create' %}" class="d-flex gap-2">
+                {% csrf_token %}
+                {{ main_form.name }}
+                <button class="btn btn-primary"><i class="bi bi-plus-lg"></i></button>
+            </form>
+        </div>
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead><tr><th>ID</th><th>Ad</th><th>Islem</th></tr></thead>
+                <tbody>
+                    {% for cat in main_cats %}
+                    <tr>
+                        <td>{{ cat.id }}</td>
+                        <td>{{ cat.name }}</td>
+                        <td>
+                            <form method="post" action="{% url 'main_category_delete' cat.pk %}" class="d-inline delete-confirm">
+                                {% csrf_token %}
+                                <button class="btn btn-danger action-btn"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center text-muted">Kategori yok</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Alt Kategoriler -->
+    <div class="col-md-6">
+        <div class="form-container mb-3">
+            <h6 class="fw-bold">Yeni Alt Kategori</h6>
+            <form method="post" action="{% url 'sub_category_create' %}" class="row g-2">
+                {% csrf_token %}
+                <div class="col-5">{{ sub_form.main_category }}</div>
+                <div class="col-5">{{ sub_form.name }}</div>
+                <div class="col-2">
+                    <button class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i></button>
+                </div>
+            </form>
+        </div>
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead><tr><th>ID</th><th>Ana Kategori</th><th>Alt Kategori</th><th>Islem</th></tr></thead>
+                <tbody>
+                    {% for cat in main_cats %}
+                    {% for sub in cat.subcategories.all %}
+                    <tr>
+                        <td>{{ sub.id }}</td>
+                        <td>{{ cat.name }}</td>
+                        <td>{{ sub.name }}</td>
+                        <td>
+                            <form method="post" action="{% url 'sub_category_delete' sub.pk %}" class="d-inline delete-confirm">
+                                {% csrf_token %}
+                                <button class="btn btn-danger action-btn"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

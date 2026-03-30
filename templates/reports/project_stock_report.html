@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Proje Bazli Stok Cikis Raporu{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-folder2-open me-2"></i>Proje Bazli Stok Cikis Raporu</h4>
+</div>
+<div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Proje</label>
+            <select name="project" class="form-select">
+                <option value="">Lutfen Seciniz</option>
+                {% for p in projects %}
+                <option value="{{ p.id }}">{{ p.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Baslangic</label>
+            <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Bitis</label>
+            <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary"><i class="bi bi-search"></i> Listele</button>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'project_stock_export' %}?project={{ request.GET.project }}&start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}" class="btn btn-info">
+                <i class="bi bi-file-earmark-excel me-1"></i>Excel Cikisi Al
+            </a>
+        </div>
+    </form>
+</div>
+{% if data %}
+<div class="table-container">
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Barkod</th><th>Urun Adi</th><th>Toplam Miktar</th><th>Toplam Tutar</th></tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+            <tr>
+                <td><code>{{ item.product__barcode }}</code></td>
+                <td>{{ item.product__name }}</td>
+                <td>{{ item.total_qty }}</td>
+                <td>{{ item.total_cost|default:"0" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

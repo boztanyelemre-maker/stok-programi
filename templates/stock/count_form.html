@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Stok Sayim{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-clipboard-check me-2"></i>Stok Sayim Fisi</h4>
+</div>
+<div class="form-container">
+    <form method="post" id="countForm">
+        {% csrf_token %}
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <label class="form-label">Proje</label>
+                <select name="project" id="count_project" class="form-select" required>
+                    <option value="">Secin...</option>
+                    {% for p in projects %}
+                    <option value="{{ p.id }}">{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Depo</label>
+                <select name="warehouse" id="count_warehouse" class="form-select">
+                    <option value="">Secin...</option>
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="button" class="btn btn-primary" id="loadProducts">
+                    <i class="bi bi-search me-1"></i>Urunleri Getir
+                </button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table class="table" id="countTable">
+                <thead>
+                    <tr><th>Barkod</th><th>Urun</th><th>Sistem Miktari</th><th>Sayilan Miktar</th><th>Fark</th></tr>
+                </thead>
+                <tbody id="countBody">
+                    <tr><td colspan="5" class="text-center text-muted">Proje ve depo secip urunleri getirin</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="text-end mt-3">
+            <button type="submit" class="btn btn-success" id="saveCount" style="display:none;">
+                <i class="bi bi-check-lg me-1"></i>Sayimi Kaydet
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.getElementById('count_project').addEventListener('change', function() {
+    var whSelect = document.getElementById('count_warehouse');
+    whSelect.innerHTML = '<option value="">Secin...</option>';
+    if (this.value) {
+        fetch('/stok/api/depolar/?project_id=' + this.value)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                data.forEach(function(item) {
+                    var opt = document.createElement('option');
+                    opt.value = item.id; opt.textContent = item.name;
+                    whSelect.appendChild(opt);
+                });
+            });
+    }
+});
+document.getElementById('loadProducts').addEventListener('click', function() {
+    var project = document.getElementById('count_project').value;
+    var warehouse = document.getElementById('count_warehouse').value;
+    if (!project) { alert('Proje secin'); return; }
+    fetch('/stok/api/sayim-urunler/?project=' + project + '&warehouse=' + warehouse)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var body = document.getElementById('countBody');
+            body.innerHTML = '';
+            if (data.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Urun bulunamadi</td></tr>';
+                return;
+            }
+            data.forEach(function(item) {
+                var row = '<tr>' +
+                    '<td><code>' + item.barcode + '</code></td>' +
+                    '<td>' + item.name + '</td>' +
+                    '<td>' + item.quantity + '<input type="hidden" name="product_id" value="' + item.id + '"><input type="hidden" name="system_qty" value="' + item.quantity + '"></td>' +
+                    '<td><input type="number" name="counted_qty" class="form-control form-control-sm counted-input" step="0.01" value="' + item.quantity + '" data-system="' + item.quantity + '"></td>' +
+                    '<td class="diff-cell">0</td></tr>';
+                body.innerHTML += row;
+            });
+            document.getElementById('saveCount').style.display = 'inline-block';
+            document.querySelectorAll('.counted-input').forEach(function(inp) {
+                inp.addEventListener('input', function() {
+                    var diff = parseFloat(this.value || 0) - parseFloat(this.dataset.system);
+                    var cell = this.closest('tr').querySelector('.diff-cell');
+                    cell.textContent = diff.toFixed(2);
+                    cell.style.color = diff < 0 ? 'red' : (diff > 0 ? 'green' : '');
+                });
+            });
+        });
+});
+</script>
+{% endblock %}

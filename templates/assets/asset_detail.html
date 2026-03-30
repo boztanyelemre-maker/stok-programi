@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Demirbas - {{ asset.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-pc-display me-2"></i>{{ asset.name }}</h4>
+    <a href="{% url 'asset_edit' asset.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-pencil me-1"></i>Duzenle</a>
+</div>
+<div class="form-container">
+    <div class="row">
+        <div class="col-md-4 mb-3"><strong>Barkod:</strong> {{ asset.barcode }}</div>
+        <div class="col-md-4 mb-3"><strong>Kod:</strong> {{ asset.code|default:"-" }}</div>
+        <div class="col-md-4 mb-3"><strong>Seri No:</strong> {{ asset.serial_no|default:"-" }}</div>
+        <div class="col-md-4 mb-3"><strong>Marka:</strong> {{ asset.brand|default:"-" }}</div>
+        <div class="col-md-4 mb-3"><strong>Model:</strong> {{ asset.model|default:"-" }}</div>
+        <div class="col-md-4 mb-3"><strong>Durum:</strong> <span class="badge status-{{ asset.status }}">{{ asset.get_status_display }}</span></div>
+        <div class="col-md-4 mb-3"><strong>Proje:</strong> {{ asset.project|default:"-" }}</div>
+        <div class="col-md-4 mb-3"><strong>Depo:</strong> {{ asset.warehouse|default:"-" }}</div>
+        <div class="col-md-4 mb-3"><strong>Lokasyon:</strong> {{ asset.location|default:"-" }}</div>
+        <div class="col-md-4 mb-3"><strong>Garanti Baslangic:</strong> {{ asset.warranty_start|date:"d/m/Y"|default:"-" }}</div>
+        <div class="col-md-4 mb-3"><strong>Garanti Bitis:</strong> {{ asset.warranty_end|date:"d/m/Y"|default:"-" }}</div>
+        <div class="col-md-4 mb-3"><strong>Garanti Durumu:</strong>
+            {% if asset.is_warranty_valid %}<span class="badge bg-success">Gecerli</span>
+            {% else %}<span class="badge bg-secondary">Bitmis/Yok</span>{% endif %}
+        </div>
+        <div class="col-md-4 mb-3"><strong>Bakim Periyodu:</strong> {{ asset.maintenance_period_months|default:"0" }} Ay</div>
+        <div class="col-md-4 mb-3"><strong>Sonraki Bakim:</strong> {{ asset.next_maintenance_date|date:"d/m/Y"|default:"-" }}</div>
+        <div class="col-md-4 mb-3"><strong>Zimmetli:</strong> {{ asset.assigned_to.get_full_name|default:"-" }}</div>
+    </div>
+    {% if asset.notes %}
+    <div class="mt-2"><strong>Notlar:</strong> {{ asset.notes }}</div>
+    {% endif %}
+</div>
+<div class="mt-3">
+    <a href="{% url 'asset_list' %}" class="btn btn-secondary"><i class="bi bi-arrow-left me-1"></i>Geri</a>
+</div>
+{% endblock %}

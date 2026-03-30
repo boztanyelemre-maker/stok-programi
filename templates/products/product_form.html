@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-box-seam me-2"></i>{{ title }}</h4>
+</div>
+<div class="form-container">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in form %}
+            <div class="col-md-{% if field.name == 'description' %}12{% else %}4{% endif %} mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<div class="text-danger small">{{ field.errors.0 }}</div>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-end mt-3">
+            <a href="{% url 'product_list' %}" class="btn btn-danger me-2">Iptal</a>
+            <button type="submit" class="btn btn-success">Kaydet</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Siparisteki Urunler{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="bi bi-box2 me-2"></i>Siparisteki Urunler</h4>
+</div>
+<div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Baslangic</label>
+            <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Bitis</label>
+            <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary"><i class="bi bi-search"></i> Listele</button>
+        </div>
+    </form>
+</div>
+<div class="table-container">
+    <table class="table table-striped">
+        <thead><tr><th>Barkod</th><th>Urun</th><th>Siparis Miktari</th><th>Teslim Edilen</th><th>Kalan</th><th>Siparis No</th><th>Proje</th></tr></thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td><code>{{ item.product.barcode }}</code></td>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.delivered_quantity }}</td>
+                <td class="{% if item.remaining > 0 %}text-warning fw-bold{% endif %}">{{ item.remaining }}</td>
+                <td><a href="{% url 'order_detail' item.order.pk %}">SIP-{{ item.order.order_no }}</a></td>
+                <td>{{ item.order.project.name }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center text-danger">Veri Yok.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
