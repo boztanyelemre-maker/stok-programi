@@ -16,8 +16,8 @@ services:
     runtime: python
     plan: free
     region: frankfurt
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --noinput
-    preDeployCommand: python manage.py migrate --noinput
+    # Ucretsiz planda preDeployCommand yok; migrate build sirasinda calisir.
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput
     startCommand: gunicorn naron.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 120
     healthCheckPath: /
     envVars:
