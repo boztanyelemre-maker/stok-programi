@@ -34,7 +34,11 @@ def _is_render() -> bool:
 # Render'da varsayılan False; yerelde True
 DEBUG = _env_bool('DEBUG', default=not _is_render())
 
-ALLOWED_HOSTS = ['*']
+_allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', '').strip()
+if _allowed_hosts_env:
+    ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(',') if h.strip()]
+else:
+    ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
