@@ -4,8 +4,9 @@
 # 1) Bu projeyi GitHub veya GitLab'a push edin (render.yaml repo kökünde olsun).
 # 2) Render Dashboard → New → Blueprint → aynı repoyu seçin → Apply.
 # 3) İlk deploy bitince URL: https://<servis-adı>.onrender.com
-# 4) Yönetici kullanıcı: Dashboard → Web Service → Shell →
-#    python manage.py createsuperuser
+# 4) Admin (Shell ucretsiz planda yok): Environment'a BOOTSTRAP_SUPERUSER_USERNAME,
+#    BOOTSTRAP_SUPERUSER_PASSWORD, BOOTSTRAP_SUPERUSER_EMAIL ekleyin; redeploy.
+#    Sonra bu env satirlarini kaldirin (guvenlik).
 #
 # Not: Ücretsiz PostgreSQL test amaçlıdır (süre/kota sınırları olabilir).
 # Medya yüklemeleri (MEDIA) ücretsiz diskte kalıcı değildir; kalıcı medya için S3 vb. eklenmelidir.
@@ -18,7 +19,7 @@ services:
     region: frankfurt
     # Ucretsiz planda preDeployCommand yok; migrate build sirasinda calisir.
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput
-    startCommand: gunicorn naron.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    startCommand: python manage.py ensure_superuser && gunicorn naron.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 120
     healthCheckPath: /
     envVars:
       - key: DATABASE_URL
